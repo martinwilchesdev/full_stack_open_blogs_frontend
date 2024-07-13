@@ -1,9 +1,15 @@
 import axios from 'axios'
+
+// helpers
+import tokenHelper from '../helpers/token_helper'
+
 const baseUrl = '/api/blogs'
 
-const getAll = () => {
-  const request = axios.get(baseUrl)
-  return request.then(response => response.data)
+const getAll = async() => {
+  const config = tokenHelper.authToken()
+  const response = await axios.get(baseUrl, config)
+
+  return response.data
 }
 
 export default { getAll }
