@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 
 // componentes
 import NotificationMessage from './components/NotificationMessage'
+import BlogForm from './components/BlogForm'
 import Login from './components/Login'
 import Blog from './components/Blog'
 
@@ -12,6 +13,11 @@ import blogService from './services/blogs'
 const App = () => {
     // lista de blogs
     const [blogs, setBlogs] = useState([])
+
+    // contenido de blog
+    const [url, setUrl] = useState('')
+    const [title, setTitle] = useState('')
+    const [author, setAuthor] = useState('')
 
     // credenciales de acceso y validacion de usuario autenticado
     const [username, setUsername] = useState('')
@@ -50,6 +56,16 @@ const App = () => {
         setUser(null)
     }
 
+    const handleCreateBlog = async(event) => {
+        event.preventDefault()
+        const responseBlogs = await blogService.create({ title, author, url })
+
+        setUrl('')
+        setTitle('')
+        setAuthor('')
+        setBlogs(blogs.concat(responseBlogs))
+    }
+
     if (user) {
         return (
             <div>
@@ -58,6 +74,15 @@ const App = () => {
                     <span>{user.name} logged in</span>
                     <button onClick={handleLogOut}>logout</button>
                 </div>
+                <BlogForm
+                    onHandleCreateBlog={handleCreateBlog}
+                    onHandleAuthor={setAuthor}
+                    onHandleTitle={setTitle}
+                    onHandleUrl={setUrl}
+                    author={author}
+                    title={title}
+                    url={url}
+                />
                 <br />
                 {blogs.map((blog) => (
                     <Blog key={blog.id} blog={blog} />
