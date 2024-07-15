@@ -11,6 +11,9 @@ import loginService from './services/login.js'
 import blogService from './services/blogs'
 
 const App = () => {
+    const [successProcess, setSuccessProcess] = useState(false)
+    const [notification, setNotification] = useState(null)
+
     // lista de blogs
     const [blogs, setBlogs] = useState([])
 
@@ -48,6 +51,7 @@ const App = () => {
             setPassword('')
         } catch(error) {
             console.log('Wrong Credentials')
+            handleNotificationMessage(false, 'wrong username or password')
         }
     }
 
@@ -58,18 +62,34 @@ const App = () => {
 
     const handleCreateBlog = async(event) => {
         event.preventDefault()
-        const responseBlogs = await blogService.create({ title, author, url })
 
-        setUrl('')
-        setTitle('')
-        setAuthor('')
-        setBlogs(blogs.concat(responseBlogs))
+        try {
+            const responseBlogs = await blogService.create({ title, author, url })
+
+            setUrl('')
+            setTitle('')
+            setAuthor('')
+            setBlogs(blogs.concat(responseBlogs))
+            handleNotificationMessage(true, `a new blog ${title} by ${author} added`)
+        } catch(error) {
+            handleNotificationMessage(false, error.message)
+        }
+    }
+
+    const handleNotificationMessage = (process, message) => {
+        setSuccessProcess(process)
+        setNotification(message)
+        setTimeout(() => setNotification(null), 5000)
     }
 
     if (user) {
         return (
             <div>
                 <h2>blogs</h2>
+                <NotificationMessage
+                    message={notification}
+                    process={successProcess}
+                />
                 <div>
                     <span>{user.name} logged in</span>
                     <button onClick={handleLogOut}>logout</button>
