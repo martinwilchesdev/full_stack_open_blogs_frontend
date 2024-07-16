@@ -4,18 +4,19 @@ import axios from 'axios'
 import tokenHelper from '../helpers/token_helper'
 
 const baseUrl = '/api/blogs'
-const config = tokenHelper.authToken()
+let config = null
 
-const getAll = async() => {
-  const response = await axios.get(baseUrl, config)
+const getAll = async () => {
+    config = tokenHelper.authToken()
+    const response = await axios.get(baseUrl, config)
 
-  return response.data
+    return response.data
 }
 
-const create = async(newBlog) => {
-  const response = await axios.post(baseUrl, newBlog, config)
+const create = async (newBlog) => {
+    const response = await axios.post(baseUrl, newBlog, config)
 
-  return response.data
+    return response.data
 }
 
 export default { getAll, create }

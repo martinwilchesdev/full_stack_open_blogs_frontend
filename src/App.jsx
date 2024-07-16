@@ -50,7 +50,6 @@ const App = () => {
             setUsername('')
             setPassword('')
         } catch(error) {
-            console.log('Wrong Credentials')
             handleNotificationMessage(false, 'wrong username or password')
         }
     }
@@ -112,9 +111,11 @@ const App = () => {
     } else {
         return(
             <Login
+                successProcess={successProcess}
                 onHandleUsername={setUsername}
                 onHandlePassword={setPassword}
                 onHandleLogin={handleLogin}
+                notification={notification}
                 username={username}
                 password={password}
             />

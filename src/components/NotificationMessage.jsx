@@ -1,7 +1,5 @@
 const NotificationMessage = (props) => {
-    if (props.message === null) {
-        return
-    }
+    if (props.message === null) return
 
     return (
         <div className={`notificationMessage ${props.process ? 'success' : 'error'}`}>

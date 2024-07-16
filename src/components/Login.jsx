@@ -7,7 +7,10 @@ const Login = (props) => {
     return(
         <div>
             <h2>log in to application</h2>
-            <NotificationMessage />
+            <NotificationMessage
+                process={props.sucessProcess}
+                message={props.notification}
+            />
             <form onSubmit={props.onHandleLogin}>
                 <div>
                     <label>username:</label>
