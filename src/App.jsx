@@ -7,6 +7,7 @@ import Login from './components/Login'
 import Blog from './components/Blog'
 
 // servicios
+import ToggleButton from './components/ToggleButton.jsx'
 import loginService from './services/login.js'
 import blogService from './services/blogs'
 
@@ -39,7 +40,7 @@ const App = () => {
         if (user) blogService.getAll().then((blogs) => setBlogs(blogs))
     }, [user])
 
-    const handleLogin = async(e) => {
+    const handleLogin = async (e) => {
         e.preventDefault()
 
         try {
@@ -49,7 +50,7 @@ const App = () => {
             setUser(user)
             setUsername('')
             setPassword('')
-        } catch(error) {
+        } catch (error) {
             handleNotificationMessage(false, 'wrong username or password')
         }
     }
@@ -59,7 +60,7 @@ const App = () => {
         setUser(null)
     }
 
-    const handleCreateBlog = async(event) => {
+    const handleCreateBlog = async (event) => {
         event.preventDefault()
 
         try {
@@ -70,7 +71,7 @@ const App = () => {
             setAuthor('')
             setBlogs(blogs.concat(responseBlogs))
             handleNotificationMessage(true, `a new blog ${title} by ${author} added`)
-        } catch(error) {
+        } catch (error) {
             handleNotificationMessage(false, error.message)
         }
     }
@@ -93,15 +94,19 @@ const App = () => {
                     <span>{user.name} logged in</span>
                     <button onClick={handleLogOut}>logout</button>
                 </div>
-                <BlogForm
-                    onHandleCreateBlog={handleCreateBlog}
-                    onHandleAuthor={setAuthor}
-                    onHandleTitle={setTitle}
-                    onHandleUrl={setUrl}
-                    author={author}
-                    title={title}
-                    url={url}
-                />
+                <ToggleButton
+                    buttonLabel='create new blog'
+                >
+                    <BlogForm
+                        onHandleCreateBlog={handleCreateBlog}
+                        onHandleAuthor={setAuthor}
+                        onHandleTitle={setTitle}
+                        onHandleUrl={setUrl}
+                        author={author}
+                        title={title}
+                        url={url}
+                    />
+                </ToggleButton>
                 <br />
                 {blogs.map((blog) => (
                     <Blog key={blog.id} blog={blog} />
@@ -109,7 +114,7 @@ const App = () => {
             </div>
         )
     } else {
-        return(
+        return (
             <Login
                 successProcess={successProcess}
                 onHandleUsername={setUsername}
