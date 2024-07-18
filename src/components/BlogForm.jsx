@@ -23,7 +23,17 @@ const BlogForm = (props) => {
             setUrl('')
             setTitle('')
             setAuthor('')
-            props.onHandleSetBlogs(props.blogs.concat(responseBlogs))
+
+            const newBlog = {
+                ...responseBlogs,
+                user: {
+                    username: props.user.username,
+                    name: props.user.name,
+                    id: props.user.userid
+                }
+            }
+
+            props.onHandleSetBlogs(props.blogs.concat(newBlog))
             props.onHandleNotificationMessage(true, `a new blog ${title} by ${author} added`)
         } catch (error) {
             props.onHandleNotificationMessage(false, error.message)

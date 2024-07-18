@@ -58,6 +58,7 @@ const App = () => {
 
     const handleLogOut = () => {
         localStorage.removeItem('loggedUserBlogsApp')
+        setBlogId(null)
         setUser(null)
     }
 
@@ -85,8 +86,23 @@ const App = () => {
             url: blog.url,
         }
 
-        const reponseBlogs = await blogService.update(blog.id, newBlog)
-        setBlogs(blogs.filter(blog => blog.id === reponseBlogs.id ? reponseBlogs : blog))
+        try {
+            const reponseBlogs = await blogService.update(blog.id, newBlog)
+            setBlogs(blogs.filter(blog => blog.id === reponseBlogs.id ? reponseBlogs : blog))
+        } catch(error) {
+            console.log(error.message)
+        }
+    }
+
+    const deleteBlog = async(deleteBlog) => {
+        try {
+            if (window.confirm(`Remove blog ${deleteBlog.title}`)) {
+                await blogService.deleteBlog(deleteBlog.id)
+                setBlogs(blogs.filter(blog => blog.id !== deleteBlog.id))
+            }
+        } catch(error) {
+            console.log(error.message)
+        }
     }
 
     if (user) {
@@ -110,6 +126,7 @@ const App = () => {
                         onhandleBlogFormVisibility={blogFormVisibility}
                         onHandleSetBlogs={setBlogs}
                         blogs={blogs}
+                        user={user}
                     />
                 </ToggleButton>
                 <br />
@@ -126,6 +143,7 @@ const App = () => {
                                     <p>{blog.url}</p>
                                     <p><span>likes: {blog.likes}</span> <button onClick={() => updateLikes(blog)}>like</button></p>
                                     <p>{blog.user.name}</p>
+                                    {user.userid === blog.user.id && <button onClick={() => deleteBlog(blog)}>delete</button>}
                                 </div>
                         }
                     </Blog>
