@@ -76,6 +76,19 @@ const App = () => {
         id.toString() === blogId ? setBlogId(null) : setBlogId(id.toString())
     }
 
+    const updateLikes = async(blog) => {
+        blog.likes += 1
+        const newBlog = {
+            author: blog.author,
+            likes: blog.likes,
+            title: blog.title,
+            url: blog.url,
+        }
+
+        const reponseBlogs = await blogService.update(blog.id, newBlog)
+        setBlogs(blogs.filter(blog => blog.id === reponseBlogs.id ? reponseBlogs : blog))
+    }
+
     if (user) {
         return (
             <div>
@@ -111,8 +124,8 @@ const App = () => {
                             blogId === blog.id.toString() &&
                                 <div className='blogInfo'>
                                     <p>{blog.url}</p>
-                                    <p><span>likes: {blog.likes}</span> <button>like</button></p>
-                                    <p>{user.name}</p>
+                                    <p><span>likes: {blog.likes}</span> <button onClick={() => updateLikes(blog)}>like</button></p>
+                                    <p>{blog.user.name}</p>
                                 </div>
                         }
                     </Blog>
