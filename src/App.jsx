@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 // componentes
 import NotificationMessage from './components/NotificationMessage'
@@ -18,15 +18,16 @@ const App = () => {
     // lista de blogs
     const [blogs, setBlogs] = useState([])
 
-    // contenido de blog
-    const [url, setUrl] = useState('')
-    const [title, setTitle] = useState('')
-    const [author, setAuthor] = useState('')
-
     // credenciales de acceso y validacion de usuario autenticado
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
+
+    // visualizacion de la informacion del blog
+    const [blogId, setBlogId] = useState(null)
+
+    // referencia al componente que muestra/oculta el formulario de creacion de blogs
+    const blogFormRef = useRef()
 
     useEffect(() => {
         const loggedUserJSON = localStorage.getItem('loggedUserBlogsApp')
@@ -60,26 +61,19 @@ const App = () => {
         setUser(null)
     }
 
-    const handleCreateBlog = async (event) => {
-        event.preventDefault()
-
-        try {
-            const responseBlogs = await blogService.create({ title, author, url })
-
-            setUrl('')
-            setTitle('')
-            setAuthor('')
-            setBlogs(blogs.concat(responseBlogs))
-            handleNotificationMessage(true, `a new blog ${title} by ${author} added`)
-        } catch (error) {
-            handleNotificationMessage(false, error.message)
-        }
-    }
-
     const handleNotificationMessage = (process, message) => {
         setSuccessProcess(process)
         setNotification(message)
         setTimeout(() => setNotification(null), 5000)
+    }
+
+    const blogFormVisibility = () => {
+        // uso del hook de referencia para manipular la visibilidad del formulario de creacion de blogs
+        blogFormRef.current.toggleVisibility()
+    }
+
+    const handleViewInfoBlog = (id) => {
+        id.toString() === blogId ? setBlogId(null) : setBlogId(id.toString())
     }
 
     if (user) {
@@ -95,21 +89,33 @@ const App = () => {
                     <button onClick={handleLogOut}>logout</button>
                 </div>
                 <ToggleButton
+                    ref={blogFormRef}
                     buttonLabel='create new blog'
                 >
                     <BlogForm
-                        onHandleCreateBlog={handleCreateBlog}
-                        onHandleAuthor={setAuthor}
-                        onHandleTitle={setTitle}
-                        onHandleUrl={setUrl}
-                        author={author}
-                        title={title}
-                        url={url}
+                        onHandleNotificationMessage={handleNotificationMessage}
+                        onhandleBlogFormVisibility={blogFormVisibility}
+                        onHandleSetBlogs={setBlogs}
+                        blogs={blogs}
                     />
                 </ToggleButton>
                 <br />
                 {blogs.map((blog) => (
-                    <Blog key={blog.id} blog={blog} />
+                    <Blog
+                        onHandleViewInfoBlog={() => handleViewInfoBlog(blog.id)}
+                        blogId={blogId}
+                        blog={blog}
+                        key={blog.id}
+                    >
+                        {
+                            blogId === blog.id.toString() &&
+                                <div className='blogInfo'>
+                                    <p>{blog.url}</p>
+                                    <p><span>likes: {blog.likes}</span> <button>like</button></p>
+                                    <p>{user.name}</p>
+                                </div>
+                        }
+                    </Blog>
                 ))}
             </div>
         )

@@ -1,21 +1,48 @@
+import { useState } from 'react'
+
+import blogService from '../services/blogs'
+
 const BlogForm = (props) => {
-    const handleUrl = ({ target }) => props.onHandleUrl(target.value)
-    const handleTitle = ({ target }) => props.onHandleTitle(target.value)
-    const handleAuthor = ({ target }) => props.onHandleAuthor(target.value)
+    // contenido de blog
+    const [url, setUrl] = useState('')
+    const [title, setTitle] = useState('')
+    const [author, setAuthor] = useState('')
+
+    const handleUrl = ({ target }) => setUrl(target.value)
+    const handleTitle = ({ target }) => setTitle(target.value)
+    const handleAuthor = ({ target }) => setAuthor(target.value)
+
+    const handleCreateBlog = async (event) => {
+        event.preventDefault()
+
+        try {
+            const responseBlogs = await blogService.create({ title, author, url })
+
+            props.onhandleBlogFormVisibility()
+
+            setUrl('')
+            setTitle('')
+            setAuthor('')
+            props.onHandleSetBlogs(props.blogs.concat(responseBlogs))
+            props.onHandleNotificationMessage(true, `a new blog ${title} by ${author} added`)
+        } catch (error) {
+            props.onHandleNotificationMessage(false, error.message)
+        }
+    }
 
     return(
-        <form onSubmit={props.onHandleCreateBlog}>
+        <form onSubmit={handleCreateBlog}>
             <div>
                 <label>title:</label>
-                <input onChange={handleTitle} value={props.title} />
+                <input onChange={handleTitle} value={title} />
             </div>
             <div>
                 <label>author:</label>
-                <input onChange={handleAuthor} value={props.author} />
+                <input onChange={handleAuthor} value={author} />
             </div>
             <div>
                 <label>url:</label>
-                <input onChange={handleUrl} value={props.url} />
+                <input onChange={handleUrl} value={url} />
             </div>
             <button type="submit">create</button>
         </form>
